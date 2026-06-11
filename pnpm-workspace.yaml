@@ -1,0 +1,8 @@
+packages:
+  - "sdk"
+  - "react"
+  - "vue"
+  - "angular"
+  - "svelte"
+  - "internal-config"
+  - "internal-test-utils"
