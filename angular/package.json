@@ -1,0 +1,105 @@
+{
+  "name": "@tracio/angular",
+  "version": "0.1.3",
+  "description": "Tracio Angular — provideTracio + signals-based service for bot detection & device fingerprinting",
+  "license": "MIT",
+  "homepage": "https://tracio.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tracio-App/sdk.git",
+    "directory": "packages/angular"
+  },
+  "bugs": {
+    "url": "https://github.com/Tracio-App/sdk/issues"
+  },
+  "author": "Tracio",
+  "keywords": [
+    "tracio",
+    "bot-detection",
+    "fingerprinting",
+    "fraud",
+    "angular"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "module": "./dist/fesm2022/tracio-angular.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/fesm2022/tracio-angular.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ssr": "node --input-type=module -e \"import('@angular/compiler').then(() => import('./dist/fesm2022/tracio-angular.mjs')).then((m) => { if (typeof m.provideTracio !== 'function') { throw new Error('provideTracio missing'); } })\"",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "publint": "publint --strict",
+    "size-limit": "size-limit",
+    "clean": "rm -rf dist coverage .turbo"
+  },
+  "peerDependencies": {
+    "@angular/common": "^17 || ^18 || ^19",
+    "@angular/core": "^17 || ^18 || ^19",
+    "@tracio/sdk": "^0.1.3",
+    "rxjs": "^7"
+  },
+  "dependencies": {
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/common": "19.2.22",
+    "@angular/compiler": "19.2.22",
+    "@angular/compiler-cli": "19.2.22",
+    "@angular/core": "19.2.22",
+    "@angular/platform-browser": "19.2.22",
+    "@angular/platform-browser-dynamic": "19.2.22",
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@tracio/internal-config": "workspace:*",
+    "@tracio/sdk": "workspace:^",
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^15.11.7",
+    "ng-packagr": "19.2.2",
+    "publint": "^0.3.0",
+    "rxjs": "^7.8.1",
+    "size-limit": "^11.1.6",
+    "tslib": "^2.8.1",
+    "typescript": "5.8.3",
+    "vitest": "^2.1.9",
+    "zone.js": "^0.15.1"
+  },
+  "size-limit": [
+    {
+      "path": "dist/fesm2022/tracio-angular.mjs",
+      "limit": "3.0 KB",
+      "import": "{ provideTracio, TracioService }",
+      "ignore": [
+        "@angular/core",
+        "@angular/common",
+        "@tracio/sdk",
+        "rxjs",
+        "tslib"
+      ]
+    }
+  ]
+}
