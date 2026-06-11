@@ -1,0 +1,93 @@
+{
+  "name": "@tracio/angular",
+  "version": "0.1.1",
+  "description": "Tracio Angular — provideTracio + signals-based service for bot detection & device fingerprinting",
+  "license": "MIT",
+  "homepage": "https://tracio.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tracio-App/sdk.git",
+    "directory": "packages/angular"
+  },
+  "bugs": {
+    "url": "https://github.com/Tracio-App/sdk/issues"
+  },
+  "author": {
+    "name": "Tracio",
+    "url": "https://tracio.ai"
+  },
+  "keywords": [
+    "tracio",
+    "bot-detection",
+    "fingerprinting",
+    "fraud",
+    "angular"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ssr": "node --input-type=commonjs -e \"require('@angular/compiler'); require('./dist/index.cjs')\" && node --input-type=module -e \"import('@angular/compiler').then(() => import('./dist/index.js'))\"",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "attw": "attw --pack .",
+    "publint": "publint --strict",
+    "size-limit": "size-limit",
+    "clean": "rm -rf dist coverage .turbo"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17",
+    "@angular/common": ">=17",
+    "@tracio/sdk": "workspace:^"
+  },
+  "devDependencies": {
+    "@angular/common": "^19.2.22",
+    "@angular/compiler": "^19.2.22",
+    "@angular/core": "^19.0.0",
+    "@angular/platform-browser": "^19.2.22",
+    "@angular/platform-browser-dynamic": "19",
+    "@arethetypeswrong/cli": "^0.18.3",
+    "@tracio/internal-config": "workspace:*",
+    "@tracio/sdk": "workspace:^",
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^15.11.7",
+    "publint": "^0.3.0",
+    "rxjs": "^7.8.1",
+    "size-limit": "^11.1.6",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9",
+    "zone.js": "^0.15.1"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "@tracio/sdk",
+  "version": "0.1.1",
+  "description": "Tracio core — bot detection & device fingerprinting (vanilla JS loader)",
+  "license": "MIT",
+  "homepage": "https://tracio.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tracio-App/sdk.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/Tracio-App/sdk/issues"
+  },
+  "author": {
+    "name": "Tracio",
+    "url": "https://tracio.ai"
+  },
+  "keywords": [
+    "tracio",
+    "bot-detection",
+    "fingerprinting",
+    "fraud",
+    "device-fingerprint",
+    "visitor-id",
+    "sdk",
+    "javascript"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ssr": "node --input-type=commonjs -e \"require('./dist/index.cjs')\" && node --input-type=module -e \"import('./dist/index.js')\"",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "attw": "attw --pack .",
+    "publint": "publint --strict",
+    "size-limit": "size-limit",
+    "test:e2e": "playwright test",
+    "clean": "rm -rf dist coverage .turbo test-results playwright-report"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
+    "@playwright/test": "^1.58.0",
+    "@tracio/internal-config": "workspace:*",
+    "@tracio/internal-test-utils": "workspace:*",
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^15.11.7",
+    "publint": "^0.3.21",
+    "size-limit": "^11.2.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}
