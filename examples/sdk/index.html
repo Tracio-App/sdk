@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@tracio/sdk — vanilla CDN demo</title>
+
+    <!--
+      Loads the published @tracio/sdk UMD build from the unpkg CDN.
+      It exposes a global `TracioSDK` with the `Tracio` factory.
+      Pin a version so the demo is reproducible.
+    -->
+    <script src="https://unpkg.com/@tracio/sdk@0.1.2/dist/index.min.js"></script>
+
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 40rem;
+        margin: 3rem auto;
+        padding: 0 1rem;
+        line-height: 1.5;
+      }
+      pre {
+        background: #f4f4f5;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+      }
+      .label {
+        color: #71717a;
+        font-size: 0.85rem;
+      }
+      code {
+        background: #f4f4f5;
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>@tracio/sdk — vanilla CDN demo</h1>
+    <p>
+      No build step. Open this file through any static server (see the README) and the SDK
+      fingerprints the current visitor.
+    </p>
+
+    <p class="label">Status</p>
+    <p id="status">running…</p>
+
+    <p class="label">Visitor ID</p>
+    <p id="visitor">—</p>
+
+    <p class="label">Bot result</p>
+    <p id="bot">—</p>
+
+    <p class="label">Raw result</p>
+    <pre id="raw">—</pre>
+
+    <script>
+      // ─── Edit this with your own public key ───────────────────────────────
+      // Find it in the Tracio dashboard under Settings → API keys.
+      const PUBLIC_KEY = "tracio_pk_555148989a564c2d6f876337141e9e586f9beb11";
+      const ENDPOINT = "https://edge.tracio.dev";
+      // ──────────────────────────────────────────────────────────────────────
+
+      const statusEl = document.getElementById("status");
+      const visitorEl = document.getElementById("visitor");
+      const botEl = document.getElementById("bot");
+      const rawEl = document.getElementById("raw");
+
+      TracioSDK.Tracio.init({ publicKey: PUBLIC_KEY, endpoint: ENDPOINT })
+        .getResult()
+        .then((result) => {
+          statusEl.textContent = "ready";
+          visitorEl.textContent = result.visitorId;
+          botEl.textContent = result.bot.detected
+            ? `bot detected (confidence ${result.bot.confidence})`
+            : "human";
+          rawEl.textContent = JSON.stringify(result, null, 2);
+        })
+        .catch((err) => {
+          statusEl.textContent = "error";
+          rawEl.textContent = `${err.name ?? "Error"} [${err.code ?? "?"}]: ${err.message}`;
+        });
+    </script>
+  </body>
+</html>

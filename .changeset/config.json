@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [["@tracio/sdk", "@tracio/react", "@tracio/vue", "@tracio/angular", "@tracio/svelte"]],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "development",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@tracio/internal-config", "@tracio/internal-test-utils"]
+}
