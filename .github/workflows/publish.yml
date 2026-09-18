@@ -1,0 +1,83 @@
+# Publish @tracio/* packages to npm with Sigstore provenance.
+#
+# Architecture (see docs/superpowers/specs/2026-05-16-tracio-sdk-npm-packages-design.md §9):
+#   Bitbucket (bitbucket.org/hub2026/tracio) is the source of truth. The
+#   packages/ subtree is mirrored to this GitHub repo (Tracio-App/sdk) by a
+#   Bitbucket Pipelines step on every release tag. npm provenance requires
+#   an OIDC-capable runner, which Bitbucket Pipelines is NOT — so publishing
+#   lives here, on GitHub Actions, triggered purely by the mirrored `v*` tag.
+#
+# This workflow does NOT bump versions, push the `v*` tag, or open release
+# PRs — that happens on the Bitbucket side: the `sdk-release` pipeline runs
+# `changeset version` (bumps + writes CHANGELOGs), commits, and then pushes
+# the `v<version>` git tag itself (`git tag` / `git push`), which the mirror
+# relays to this repo. This workflow only builds, gates, and publishes
+# whatever versions the tag carries. `changeset publish` is a no-op for any
+# package whose version already exists on npm, so re-runs are safe.
+name: Publish (npm + provenance)
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance via OIDC
+
+# Serialize publishes so a master-mirror and a tag-mirror that arrive seconds
+# apart can't race two `changeset publish` runs against npm. Never cancel a
+# publish mid-flight (cancel-in-progress: false). (SDK audit — ci/cd race.)
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      # No `version:` here — pnpm/action-setup (v4.1+) errors if pnpm is pinned
+      # both here and via packageManager in package.json. The mirrored root
+      # package.json carries `packageManager: pnpm@9.x`, which is the single
+      # source of truth the action reads.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm build
+
+      # Mirror the Bitbucket `packages-quality` gate exactly — this is the
+      # last gate before npm and it checks out the mirror tag (possible
+      # mirror-only drift), so it must not be a weaker subset. In particular
+      # `test:ssr` guards the core SSR import-safety contract.
+      - name: Quality gates
+        run: |
+          pnpm format:check
+          pnpm lint
+          pnpm typecheck
+          pnpm test
+          pnpm publint
+          pnpm size-limit
+          pnpm attw
+          pnpm test:ssr
+
+      - name: Publish to npm
+        run: pnpm changeset publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
