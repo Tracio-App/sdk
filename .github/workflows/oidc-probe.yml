@@ -1,0 +1,103 @@
+# One-shot probe for npm trusted publishing (OIDC). Removed after validation.
+# Publishes @tracio/oidc-probe — a package outside the workspace, so the real
+# release path is untouched.
+#
+# Environment steps mirror publish.yml (same action SHAs, same order) so the
+# answers this probe produces transfer to the real release. Three deliberate
+# differences, all of which Task 4 must NOT copy verbatim:
+#   1. NODE_AUTH_TOKEN is conditional here; publish.yml has it unconditional
+#      (and Task 4 removes it entirely).
+#   2. registry-url is an expression here so one promote can test both
+#      hypotheses; publish.yml keeps a literal — whichever value this probe
+#      confirms.
+#   3. No `cache: "pnpm"` and no dependency install — the probe publishes a
+#      single file and needs neither.
+name: OIDC probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Probe version to publish (0.0.1, 0.0.2, ...)"
+        required: true
+        type: string
+      auth:
+        description: "How to authenticate the publish"
+        required: true
+        type: choice
+        options:
+          - oidc
+          - token
+        default: oidc
+      registry_url:
+        description: "Set registry-url in setup-node"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    # env at JOB level, not step level: publish.yml declares it on the publish
+    # step, and copying that layout would leave the guard blind — it would print
+    # empty always and pass always.
+    env:
+      # Вход СТРОКОВЫЙ (type: choice) намеренно. С `type: boolean` секрет
+      # подставлялся даже при значении false — и с голым `inputs.use_token`,
+      # и с явным сравнением обеих форм (прогоны 35592404096 и 35594226073,
+      # оба остановлены гардом ДО публикации). Причина того поведения не
+      # установлена, поэтому она устранена как класс: сравнение строки со
+      # строкой однозначно.
+      NODE_AUTH_TOKEN: ${{ inputs.auth == 'token' && secrets.NPM_TOKEN || '' }}
+      NPM_CONFIG_PROVENANCE: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          registry-url: ${{ inputs.registry_url && 'https://registry.npmjs.org' || '' }}
+
+      - name: Guard — token present exactly when requested
+        run: |
+          # Замер самих выражений: если гард снова сработает, из лога будет
+          # видно, КАКОЕ сравнение дало не тот результат, без ещё одного цикла
+          # «правка → промоут → mirror».
+          echo "inputs.auth raw:        '${{ inputs.auth }}'"
+          echo "auth == 'token':        ${{ inputs.auth == 'token' }}"
+          echo "NODE_AUTH_TOKEN set:    ${NODE_AUTH_TOKEN:+yes}"
+          if [ "${{ inputs.auth }}" = "oidc" ] && [ -n "${NODE_AUTH_TOKEN}" ]; then
+            echo "ERROR: auth=oidc but NODE_AUTH_TOKEN is set — probe invalid"
+            exit 1
+          fi
+          if [ "${{ inputs.auth }}" = "token" ] && [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "ERROR: auth=token but the variable is empty — guard is blind"
+            exit 1
+          fi
+
+      - name: Pin npm that pnpm delegates to, and publish
+        working-directory: oidc-probe
+        env:
+          # inputs.* is untrusted input; keep it out of the shell command line
+          PROBE_VERSION: ${{ inputs.version }}
+        run: |
+          npm i -g npm@11.19.1
+          pnpm config set --global npm-path "$(command -v npm)"
+          echo "pnpm version: $(pnpm --version)"
+          echo "npm-path: $(pnpm config get npm-path)"
+          "$(pnpm config get npm-path)" --version
+          echo "NPM_CONFIG_USERCONFIG=${NPM_CONFIG_USERCONFIG:-<unset>}"
+          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || echo "<no npmrc>"
+          npm version "$PROBE_VERSION" --no-git-tag-version
+          pnpm publish --access public --no-git-checks

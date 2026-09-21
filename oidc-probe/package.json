@@ -1,0 +1,17 @@
+{
+  "name": "@tracio/oidc-probe",
+  "version": "0.0.0",
+  "description": "Throwaway probe validating npm trusted publishing (OIDC). Not intended for use.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tracio-App/sdk.git",
+    "directory": "oidc-probe"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "README.md"
+  ]
+}
