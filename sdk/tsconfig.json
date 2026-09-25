@@ -1,0 +1,9 @@
+{
+  "extends": "@tracio/internal-config/tsconfig.lib.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts", "tests/**", "dist/**"]
+}
