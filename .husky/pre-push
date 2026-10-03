@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Cheap subset of the CI `packages-quality` gate, run before push so the
+# fast/static checks fail locally instead of burning a Bitbucket build.
+# Heavy steps (build/test/attw/publint/size-limit) stay in CI only.
+cd packages
+pnpm lint
+pnpm typecheck
+pnpm format:check

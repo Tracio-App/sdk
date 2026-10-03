@@ -1,0 +1,10 @@
+packages:
+  - "sdk"
+  - "react"
+  - "vue"
+  - "angular"
+  - "svelte"
+  - "shield-core"
+  - "shield-worker"
+  - "internal-config"
+  - "internal-test-utils"

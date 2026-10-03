@@ -1,0 +1,11 @@
+# The Bitbucket step "mirror packages/ -> GitHub (Tracio-App/sdk)" publishes
+# `git archive HEAD:packages`; export-ignore keeps a path out of that snapshot.
+#
+# shield-core stays private until the Tracio Shield release phase: it must not
+# reach the public mirror before then. Remove this line when the package is
+# published.
+shield-core/ export-ignore
+
+# shield-worker is the Worker built on shield-core and ships with it: not on
+# the public mirror until the Shield release phase either.
+shield-worker/ export-ignore
