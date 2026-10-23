@@ -1,0 +1,19 @@
+{
+  "name": "@tracio/internal-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsup.preset": "./tsup.preset.ts",
+    "./tsconfig.lib.json": "./tsconfig.lib.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "tsup.preset.ts",
+    "tsconfig.lib.json"
+  ],
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
