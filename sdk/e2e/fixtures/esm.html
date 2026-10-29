@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>@tracio/sdk — ESM smoke</title>
+    <script type="module">
+      // The built ESM entry, loaded as a real module from a real origin.
+      import { Tracio } from "/dist/index.js";
+      window.runInit = (opts) => Tracio.init(opts).getResult();
+      window.__esmReady = true;
+    </script>
+  </head>
+  <body>
+    ok
+  </body>
+</html>
